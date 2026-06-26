@@ -217,9 +217,7 @@ PIZZA 1
 ```
 
 Two customers purchase pizza simultaneously.
-
 Only one should succeed.
-
 Database consistency must always be preserved.
 
 ---
@@ -272,7 +270,6 @@ Requirements:
 # Phase 6 — Payment Authorization
 
 Payment approval takes approximately five seconds.
-
 Immediately after:
 
 ```text
@@ -304,9 +301,7 @@ Payment results are saved.
 # Phase 7 — Oven Queue
 
 The machine contains a single oven.
-
 Orders wait in line.
-
 Example:
 
 ```text
