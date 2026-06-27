@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-Wall -Wextra -std=c++20 
-LDFLAGS=
+LDFLAGS=-lmysqlcppconn
 
 SRC_DIR=src
 INCLUDE_DIR=include

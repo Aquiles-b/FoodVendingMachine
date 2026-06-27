@@ -45,7 +45,6 @@ The internal architecture is left to you.
 # Database
 
 Use MySQL.
-
 Suggested tables:
 
 ## products
