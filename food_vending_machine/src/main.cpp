@@ -7,6 +7,10 @@
 #include <cppconn/statement.h>
 #include <cppconn/resultset.h>
 
+#include <client_session.hpp>
+
+using namespace food_vm;
+
 void mysql_conn_example()
 {
     sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
@@ -26,29 +30,15 @@ void mysql_conn_example()
     delete connection;
 }
 
-class ClientSession {
-    public:
-        ClientSession(asio::ip::tcp::socket socket):
-            m_socket{std::move(socket)} {
-                m_message = "Hello!\n";
-                send();
+void start_server(asio::io_context& io, asio::ip::tcp::acceptor& acp)
+{
+    acp.async_accept([&io, &acp](const asio::error_code& e, asio::ip::tcp::socket socket) {
+            if (e.value()) {
+                std::cout << "Error on accept: (" << e.value() << ") " << e.message() << "\n";
+                return;
             }
-
-        void send() {
-            asio::async_write(m_socket, asio::buffer(m_message), [](const asio::error_code& e, long unsigned int b) {
-                    std::cout << "Write finished!\n";
-                }
-            );
-        }
-
-    private:
-        asio::ip::tcp::socket m_socket;
-        std::string m_message;
-};
-
-void start_server(asio::io_context& io, asio::ip::tcp::acceptor& acp) {
-    acp.async_accept([&io, &acp](const asio::error_code& ec, asio::ip::tcp::socket socket) {
-            ClientSession* cs = new ClientSession(std::move(socket));
+            std::shared_ptr<ClientSession> cs = std::make_shared<ClientSession>(std::move(socket));
+            cs->start();
             start_server(io, acp);
     });
 }
