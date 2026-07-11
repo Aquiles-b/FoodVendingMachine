@@ -33,6 +33,7 @@ void ClientSession::read()
                 std::cout << "Error on read: (" << e.value() << ") " << e.message() << "\n";
                 return;
             }
+            self->m_message = self->m_controller.parse_user_input(self->m_message);
             self->write();
         }
     );
