@@ -26,6 +26,8 @@ class FoodVmDatabase {
         ~FoodVmDatabase();
 
         std::vector<ProductInfo> get_product_info();
+        std::unordered_map<std::string, ProductInfo> get_product_info_name_mapped();
+        std::unordered_map<size_t, ProductInfo> get_product_info_id_mapped();
 
     private:
         std::unique_ptr<sql::Connection> m_connection;

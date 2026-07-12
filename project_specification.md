@@ -132,24 +132,6 @@ Disconnects the client.
 
 ---
 
-### BUY
-
-Example:
-
-```text
-BUY BURGER
-```
-
-Response:
-
-```text
-Order #34 accepted
-```
-
-A new order is recorded in the database.
-
----
-
 # Phase 2 — Customer Session Flow
 
 Supported commands:

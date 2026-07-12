@@ -1,4 +1,5 @@
 #include <food_vm_database.hpp>
+#include <string_utils.hpp>
 
 using namespace food_vm;
 
@@ -35,4 +36,27 @@ std::vector<ProductInfo> FoodVmDatabase::get_product_info()
     }
 
     return products;
+}
+
+std::unordered_map<std::string, ProductInfo> FoodVmDatabase::get_product_info_name_mapped() {
+    std::vector<ProductInfo> prods = get_product_info();
+    std::unordered_map<std::string, ProductInfo> prod_info_name_mapped;
+
+    for (const auto& p : prods) {
+        std::string k = str_util::to_uppercase(p.name);
+        prod_info_name_mapped[k] = p;
+    }
+
+    return prod_info_name_mapped;
+}
+
+std::unordered_map<size_t, ProductInfo> FoodVmDatabase::get_product_info_id_mapped() {
+    std::vector<ProductInfo> prods = get_product_info();
+    std::unordered_map<size_t, ProductInfo> prod_info_id_mapped;
+
+    for (const auto& p : prods) {
+        prod_info_id_mapped[p.id] = p;
+    }
+
+    return prod_info_id_mapped;
 }

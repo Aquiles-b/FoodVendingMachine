@@ -4,6 +4,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <set>
 
 #include <food_vm_database.hpp>
 
@@ -17,8 +18,12 @@ class FoodVmController {
 
     private:
         FoodVmDatabase& m_food_vm_db;
+        std::set<size_t> m_product_selection;
 
         std::string create_menu_table_message();
+        std::string select_products(const std::vector<std::string_view>& selected_prods);
+        std::string get_selected_products_table_message(
+            const std::unordered_map<size_t, ProductInfo> &prod_id_mapped);
 };
 
 }
