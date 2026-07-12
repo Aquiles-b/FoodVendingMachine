@@ -11,15 +11,14 @@ namespace food_vm {
 
 class FoodVmController {
     public:
-        FoodVmController();
+        FoodVmController(FoodVmDatabase& food_vm_database);
 
-        std::string parse_user_input(std::string_view user_input);
+        std::string parse_user_input(std::string user_input);
 
     private:
-        int state;
-        std::unique_ptr<FoodVmDatabase> m_food_vm_db;
+        FoodVmDatabase& m_food_vm_db;
 
-        std::vector<std::string_view> tokenize_input(std::string_view input);
+        std::string create_menu_table_message();
 };
 
 }

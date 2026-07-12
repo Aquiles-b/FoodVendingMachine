@@ -28,8 +28,7 @@ class FoodVmDatabase {
         std::vector<ProductInfo> get_product_info();
 
     private:
-        sql::mysql::MySQL_Driver* m_driver;
-        sql::Connection* m_connection;
+        std::unique_ptr<sql::Connection> m_connection;
 };
 
 }
