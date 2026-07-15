@@ -7,8 +7,7 @@ ClientSession::ClientSession(asio::ip::tcp::socket socket):
     m_socket{std::move(socket)},
     m_food_vm_db{"tcp://127.0.0.1:3306", "my_user", "my_password", "my_database"},
     m_controller{m_food_vm_db}
-{
-}
+{}
 
 ClientSession::~ClientSession()
 {
@@ -43,9 +42,10 @@ void ClientSession::read()
     m_message.clear();
     asio::dynamic_string_buffer b = asio::dynamic_buffer(m_message);
 
-    asio::async_read_until(m_socket, b, '\n', [self] (const asio::error_code& e, std::size_t bt) {
+    asio::async_read_until(m_socket, b, '\n', [self] (const asio::error_code& e, size_t b) {
             if (e.value()) {
-                std::cout << "Error on read: (" << e.value() << ") " << e.message() << "\n";
+                std::cout << "Error on read: (" << e.value() << ") " << e.message() 
+                << "bytes: " << b << "\n";
                 return;
             }
             self->m_message = self->m_controller.parse_user_input(self->m_message);
@@ -57,9 +57,10 @@ void ClientSession::read()
 void ClientSession::write()
 {
     std::shared_ptr<ClientSession> self = shared_from_this();
-    asio::async_write(m_socket, asio::buffer(m_message), [self](const asio::error_code& e, long unsigned int b) {
+    asio::async_write(m_socket, asio::buffer(m_message), [self](const asio::error_code& e, size_t b) {
             if (e.value()) {
-                std::cout << "Error on write: (" << e.value() << ") " << e.message() << "\n";
+                std::cout << "Error on write: (" << e.value() << ") " << e.message()
+                << "bytes: " << b << "\n";
                 return;
             }
             if (self->m_message == "Bye!\n") {

@@ -73,10 +73,19 @@ Suggested tables:
 | Column      | Type     |
 | ----------- | -------- |
 | id          | INT      |
-| product_id  | INT      |
 | state       | VARCHAR  |
 | total_price | DECIMAL  |
 | created_at  | DATETIME |
+
+---
+
+## order_items
+
+| Column      | Type     |
+| ----------- | -------- |
+| order_id    | INT      |
+| product_id  | INT      |
+| unit_price  | DECIMAL  |
 
 ---
 

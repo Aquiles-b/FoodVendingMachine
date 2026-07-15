@@ -2,10 +2,9 @@
 #define _CLIENT_SESSION_HPP_
 
 #include <asio.hpp>
-#include <iostream>
 
-#include <food_vm_controller.hpp>
 #include <food_vm_database.hpp>
+#include <food_vm_controller.hpp>
 
 namespace food_vm {
 
