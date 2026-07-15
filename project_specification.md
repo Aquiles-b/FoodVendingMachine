@@ -22,8 +22,6 @@ The server is the main focus. Telnet or Netcat may be used as clients.
 
 # System Components
 
-Suggested modules:
-
 * TCP Server
 * Client Session
 * Vending Machine Controller
@@ -38,14 +36,11 @@ Suggested modules:
 * Database Service
 * Administration Interface
 
-The internal architecture is left to you.
-
 ---
 
 # Database
 
-Use MySQL.
-Suggested tables:
+Tables:
 
 ## products
 
@@ -116,7 +111,6 @@ Commands:
 ### LIST
 
 Displays available products.
-
 Example:
 
 ```text
@@ -126,9 +120,10 @@ LIST
 Response:
 
 ```text
-PIZZA 20
-BURGER 15
-SODA 5
+ID  Product   Price
+1   PIZZA     20
+2   BURGER    15
+3   SODA      5
 ```
 
 Products are loaded from MySQL.
@@ -136,7 +131,6 @@ Products are loaded from MySQL.
 ---
 
 ### QUIT
-
 Disconnects the client.
 
 ---
@@ -146,29 +140,20 @@ Disconnects the client.
 Supported commands:
 
 ### SELECT
-
 ```text
-SELECT BURGER
+SELECT BURGER 1 3
 ```
 
----
-
-### INSERT
-
-```text
-INSERT 20
-```
+Selection can be by name or ID
 
 ---
 
 ### CONFIRM
-
-Finalizes the order.
+Finalizes the order and start the payment flow.
 
 ---
 
 ### STATUS
-
 Returns the order state.
 
 Example:
@@ -188,7 +173,6 @@ Order state changes are stored in MySQL.
 ---
 
 # Phase 3 — Concurrent Customers
-
 The machine supports multiple clients simultaneously.
 
 Requirements:
@@ -208,7 +192,6 @@ PIZZA 1
 
 Two customers purchase pizza simultaneously.
 Only one should succeed.
-Database consistency must always be preserved.
 
 ---
 
@@ -235,7 +218,6 @@ Ready.
 ```
 
 Order state changes are recorded.
-
 Order history is stored.
 
 ---
@@ -260,30 +242,6 @@ Requirements:
 # Phase 6 — Payment Authorization
 
 Payment approval takes approximately five seconds.
-Immediately after:
-
-```text
-BUY BURGER
-```
-
-Return:
-
-```text
-Authorizing payment...
-```
-
-Later:
-
-```text
-Payment approved.
-```
-
-or
-
-```text
-Payment rejected.
-```
-
 Payment results are saved.
 
 ---
@@ -301,7 +259,6 @@ Order 12
 ```
 
 Execution order must be preserved.
-
 Order transitions are recorded in the database.
 
 ---
@@ -313,7 +270,6 @@ Simulated sensors:
 ### Temperature
 
 Every second.
-
 Example:
 
 ```text
@@ -325,7 +281,6 @@ TEMP 42C
 ### Door
 
 Every five seconds.
-
 Example:
 
 ```text
@@ -337,7 +292,6 @@ DOOR CLOSED
 ### Inventory Monitor
 
 Every thirty seconds.
-
 When stock becomes low:
 
 ```text
@@ -356,7 +310,7 @@ Command:
 WATCH
 ```
 
-Clients receive asynchronous notifications.
+Receive asynchronous notifications.
 
 Examples:
 
@@ -451,31 +405,9 @@ Store events:
 * cancellation
 * low stock alerts
 
-Logs may be stored in files, database tables, or both.
-
 ---
 
-# Phase 12 — Refill Vehicle
-
-A separate application represents the delivery truck.
-
-Commands:
-
-```text
-RESTOCK BURGER 50
-```
-
-```text
-RESTOCK PIZZA 20
-```
-
-Inventory updates become visible immediately.
-
-All changes are persisted.
-
----
-
-# Phase 13 — Statistics
+# Phase 12 — Statistics
 
 Maintain:
 
@@ -499,11 +431,9 @@ Revenue: 4280
 Most Sold: BURGER
 ```
 
-Statistics must survive server restarts.
-
 ---
 
-# Phase 14 — Historical Queries
+# Phase 13 — Historical Queries
 
 Command:
 
@@ -582,28 +512,11 @@ TEMPERATURE ALARM
 ```
 
 Preparation pauses until temperature returns to normal.
-
 All events are persisted.
 
 ---
 
 # Stretch Goals
-
-## Ingredients Table
-
-Products are composed of ingredients.
-
-Example:
-
-Burger:
-
-* Bread
-* Meat
-* Cheese
-
-Inventory is maintained per ingredient.
-
----
 
 ## Persistence Recovery
 
