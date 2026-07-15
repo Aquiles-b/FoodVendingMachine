@@ -50,6 +50,13 @@ std::string FoodVmController::handle_menu_state(const std::vector<std::string_vi
     else if (cmd == "CONFIRM") {
         return confirm_order();
     }
+    else if (cmd == "HELP") {
+        return "Available commands:\n"
+               "LIST - List available products\n"
+               "SELECT <id/name> - Select products by ID or name\n"
+               "CONFIRM - Confirm the selected products and proceed to payment\n"
+               "QUIT - Exit the application\n";
+    }
     else if (cmd == "QUIT") {
         return "Bye!\n";
     }
