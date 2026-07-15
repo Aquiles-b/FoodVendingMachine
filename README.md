@@ -1,4 +1,4 @@
-# Food Vending Machine
+# Food Vending Machine (in progress)
 
 A terminal-based vending machine server in C++20. Each TCP connection is an independent session where clients browse products, build an order, and go through a payment flow. Built to explore ASIO and MySQL integration.
 
@@ -49,7 +49,7 @@ Listens on port `6666`. Connect with `telnet localhost 6666`.
 | `CONFIRM`             | Confirm the order and start the payment flow.       |
 | `QUIT`                | End the session.                                    |
 
-**Payment flow:** after `CONFIRM`, select a payment method by number (or `0` to cancel). Then enter the payment amount when prompted. Payment is processed asynchronously — the result is pushed back to the client.
+**Payment flow:** after `CONFIRM`, select a payment method by number (or `0` to cancel). Then enter the payment amount when prompted. Payment is processed asynchronously, the result is pushed back to the client.
 
 ## Architecture
 
