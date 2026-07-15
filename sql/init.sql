@@ -17,8 +17,7 @@ CREATE TABLE inventory (
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     state VARCHAR(32),
-    total_price DECIMAL(10, 2) NOT NULL,
-    created_at DATETIME NOT NULL
+    total_price DECIMAL(10, 2) NOT NULL
 );
 
 CREATE TABLE order_items (

@@ -9,18 +9,16 @@
 
 using namespace food_vm;
 
-FoodVmController::FoodVmController(FoodVmDatabase &food_vm_db, asio::any_io_executor executor,
-        NotificationCallback<ControllerEvent> client_notification)
-    : m_food_vm_db{food_vm_db},
-      m_executor{executor},
-      m_client_notification{client_notification},
-      m_controller_state{FoodVmControllerState::MENU}
+FoodVmController::FoodVmController(FoodVmDatabase& food_vm_db, asio::any_io_executor executor,
+                                   NotificationCallback<ControllerEvent> client_notification)
+    : m_food_vm_db{food_vm_db}, m_executor{executor}, m_client_notification{client_notification},
+      m_controller_state{FoodVmControllerState::MENU}, m_order{food_vm_db}
 {
-    m_food_vm_payment = std::make_shared<FoodVmPayment>(m_executor,
-            [this](PaymentEvent e) { payment_notification_callback(e); });
+    m_food_vm_payment = std::make_shared<FoodVmPayment>(
+        m_executor, [this](PaymentEvent e) { payment_notification_callback(e); });
 }
 
-std::string FoodVmController::parse_user_input(std::string user_input) 
+std::string FoodVmController::parse_user_input(std::string user_input)
 {
     user_input = str_util::to_uppercase(user_input);
     std::vector<std::string_view> tokens = str_util::tokenize_input(user_input);
@@ -30,10 +28,10 @@ std::string FoodVmController::parse_user_input(std::string user_input)
     }
 
     switch (m_controller_state) {
-        case FoodVmControllerState::MENU:
-            return handle_menu_state(tokens);
-        case FoodVmControllerState::PAYMENT:
-            return handle_payment_state(tokens);
+    case FoodVmControllerState::MENU:
+        return handle_menu_state(tokens);
+    case FoodVmControllerState::PAYMENT:
+        return handle_payment_state(tokens);
     };
 
     assert(false && "Invalid controller state");
@@ -66,19 +64,19 @@ std::string FoodVmController::handle_payment_state(const std::vector<std::string
 
     if (!str_util::is_digit(response)) {
         switch (m_food_vm_payment->get_payment_state()) {
-            case PaymentState::CHOOSING_PAYMENT_METHOD:
-                out << "\nInvalid option!\n" << "Available options:\n" << get_payment_options_message();
-                break;
-            case PaymentState::WAITING_FOR_PAYMENT:
-                out << "Error reading the card. Please try again:\n"
-                    << m_food_vm_payment->request_payment(m_order.total_price);
-                break;
-            case PaymentState::PROCESSING_PAYMENT:
-                out << "Processing payment...\n";
-                break;
-            case PaymentState::PAYMENT_SUCCESSFUL:
-                out << "Payment successful! Thank you for your purchase.\n";
-                break;
+        case PaymentState::CHOOSING_PAYMENT_METHOD:
+            out << "\nInvalid option!\n" << "Available options:\n" << get_payment_options_message();
+            break;
+        case PaymentState::WAITING_FOR_PAYMENT:
+            out << "Error reading the card. Please try again:\n"
+                << m_food_vm_payment->request_payment(m_order.get_order_info().total_price);
+            break;
+        case PaymentState::PROCESSING_PAYMENT:
+            out << "Processing payment...\n";
+            break;
+        case PaymentState::PAYMENT_SUCCESSFUL:
+            out << "Payment successful! Thank you for your purchase.\n";
+            break;
         }
         return out.str();
     }
@@ -95,25 +93,25 @@ std::string FoodVmController::handle_payment_state(const std::vector<std::string
     std::vector<std::string> payment_options = m_food_vm_payment->list_payment_options();
 
     switch (m_food_vm_payment->get_payment_state()) {
-        case PaymentState::CHOOSING_PAYMENT_METHOD:
-            if (option > payment_options.size()) {
-                out << "\nInvalid option!\n" << "Available options:\n" << get_payment_options_message();
-                break;
-            }
-            out << "Option selected: " << payment_options[option - 1] << "\n";
-            out << m_food_vm_payment->request_payment(m_order.total_price);
+    case PaymentState::CHOOSING_PAYMENT_METHOD:
+        if (option > payment_options.size()) {
+            out << "\nInvalid option!\n" << "Available options:\n" << get_payment_options_message();
             break;
-        case PaymentState::WAITING_FOR_PAYMENT:
-            money_input = std::atof(response.data());
-            out << "Processing payment...\n";
-            m_food_vm_payment->process_payment(m_order.total_price, money_input);
-            break;
-        case PaymentState::PROCESSING_PAYMENT:
-            out << "Processing payment...\n";
-            break;
-        case PaymentState::PAYMENT_SUCCESSFUL:
-            out << "Payment successful! Thank you for your purchase.\n";
-            break;
+        }
+        out << "Option selected: " << payment_options[option - 1] << "\n";
+        out << m_food_vm_payment->request_payment(m_order.get_order_info().total_price);
+        break;
+    case PaymentState::WAITING_FOR_PAYMENT:
+        money_input = std::atof(response.data());
+        out << "Processing payment...\n";
+        m_food_vm_payment->process_payment(m_order.get_order_info().total_price, money_input);
+        break;
+    case PaymentState::PROCESSING_PAYMENT:
+        out << "Processing payment...\n";
+        break;
+    case PaymentState::PAYMENT_SUCCESSFUL:
+        out << "Payment successful! Thank you for your purchase.\n";
+        break;
     }
 
     return out.str();
@@ -125,39 +123,50 @@ void FoodVmController::payment_notification_callback(PaymentEvent e)
     std::ostringstream out;
 
     switch (e.status) {
-        case PaymentStatus::SUCCESS:
-            m_controller_state = FoodVmControllerState::MENU;
-            m_food_vm_payment->reset_payment_state();
-            m_order.product_ids.clear();
-            m_order.total_price = 0.0;
+    case PaymentStatus::SUCCESS:
+        m_order.register_event(FoodVmOrderStatus::PAYMENT_CONFIRMED);
+        m_controller_state = FoodVmControllerState::MENU;
+        m_food_vm_payment->reset_payment_state();
 
-            event.message = "Payment successful! Thank you for your purchase.\n";
-            m_client_notification.notify(event);
-            break;
-        case PaymentStatus::INSUFFICIENT_FUNDS:
-            out << "Insufficient funds. Please try again:\n"
-                << m_food_vm_payment->request_payment(m_order.total_price);
-            event.message = out.str();
-            m_client_notification.notify(event);
-            break;
-        case PaymentStatus::PAYMENT_FAILED:
-            m_controller_state = FoodVmControllerState::MENU;
-            m_food_vm_payment->reset_payment_state();
-            event.message = "Payment failed. Returning to menu.\n";
-            m_client_notification.notify(event);
-            break;
+        out << "Payment successful! Thank you for your purchase.\n";
+        out << "Order #" << m_order.get_order_info().id << " is being prepared.\n";
+        m_order.register_event(FoodVmOrderStatus::PREPARATION_STARTED);
+        m_order.register_order_products();
+
+        event.message = out.str();
+        m_client_notification.notify(event);
+        break;
+    case PaymentStatus::INSUFFICIENT_FUNDS:
+        m_order.register_event(FoodVmOrderStatus::PAYMENT_FAILED);
+        out << "Insufficient funds. Please try again:\n"
+            << m_food_vm_payment->request_payment(m_order.get_order_info().total_price);
+        event.message = out.str();
+        m_client_notification.notify(event);
+        break;
+    case PaymentStatus::PAYMENT_FAILED:
+        m_order.register_event(FoodVmOrderStatus::PAYMENT_FAILED);
+        m_controller_state = FoodVmControllerState::MENU;
+        m_food_vm_payment->reset_payment_state();
+
+        event.message = "Payment failed. Returning to menu.\n";
+        m_client_notification.notify(event);
+        break;
     }
 }
 
-std::string FoodVmController::confirm_order() 
+std::string FoodVmController::confirm_order()
 {
+    std::string error_msg;
+    if (!m_order.separate_order(error_msg)) {
+        return error_msg;
+    }
+
     m_controller_state = FoodVmControllerState::PAYMENT;
 
     std::ostringstream out;
 
     out << "\nConfirming order...\n"
-        << get_selected_products_table_message(m_food_vm_db.get_product_info_id_mapped())
-        << "Please select a payment option:\n"
+        << m_order.get_selected_products_table_message() << "Please select a payment option:\n"
         << get_payment_options_message();
 
     return out.str();
@@ -223,59 +232,21 @@ std::string FoodVmController::select_products(const std::vector<std::string_view
         out << "\n";
     }
 
-    for (const size_t& id : prods_to_add) {
-        m_order.product_ids.insert(id);
-    }
+    m_order.add_product(prods_to_add);
 
-    m_order.total_price = 0.0;
-    for (const size_t& id : m_order.product_ids) {
-        auto prod = prod_id_mapped.find(id);
-        if (prod != prod_id_mapped.end()) {
-            m_order.total_price += prod->second.price;
-        }
-    }
-
-    out << get_selected_products_table_message(prod_id_mapped);
+    out << m_order.get_selected_products_table_message();
 
     return out.str();
 }
 
-std::string FoodVmController::get_selected_products_table_message(
-    const std::unordered_map<size_t, ProductInfo>& prod_id_mapped) 
-{
-    std::ostringstream out;
-
-    out << std::string(19, '-') << "\n"
-        << "Selected products\n"
-        << std::string(19, '-') << "\n";
-
-
-    out << std::fixed << std::setprecision(2);
-
-    for (const size_t& p : m_order.product_ids) {
-        auto prod = prod_id_mapped.find(p);
-        if (prod != prod_id_mapped.end()) {
-            out << std::left << std::setw(10) << prod->second.name
-                << std::right << std::setw(8) << prod->second.price
-                << "\n";
-        }
-    }
-    out << std::string(19, '-') << "\n";
-    out << "Total:" << std::right << std::setw(12) << m_order.total_price << "\n";
-    out << std::string(19, '-') << "\n";
-
-    return out.str();
-}
-
-std::string FoodVmController::create_menu_table_message() 
+std::string FoodVmController::create_menu_table_message()
 {
     std::ostringstream out;
     std::vector<ProductInfo> products = m_food_vm_db.get_product_info();
 
-    out << std::string(35, '-') << "\n" 
-        << std::left << std::setw(4) << "ID"
-        << std::setw(20) << "Name"
-        << std::right << std::setw(10) << "Price"
+    out << std::string(35, '-') << "\n"
+        << std::left << std::setw(4) << "ID" << std::setw(20) << "Name" << std::right
+        << std::setw(10) << "Price"
         << "\n"
         << std::string(35, '-') << "\n";
 
@@ -285,10 +256,8 @@ std::string FoodVmController::create_menu_table_message()
         if (!prod.enabled) {
             continue;
         }
-        out << std::left << std::setw(4) << prod.id
-            << std::setw(20) << prod.name 
-            << std::right << std::setw(10) << prod.price 
-            << '\n';
+        out << std::left << std::setw(4) << prod.id << std::setw(20) << prod.name << std::right
+            << std::setw(10) << prod.price << '\n';
     }
     out << std::string(35, '-') << "\n\n";
 

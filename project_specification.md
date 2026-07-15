@@ -70,7 +70,6 @@ Tables:
 | id          | INT      |
 | state       | VARCHAR  |
 | total_price | DECIMAL  |
-| created_at  | DATETIME |
 
 ---
 

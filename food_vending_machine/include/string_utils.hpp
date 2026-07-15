@@ -12,5 +12,4 @@ bool is_digit(std::string_view s);
 
 } // namespace food_vm::str_util
 
-
 #endif // _STRING_UTILS_HPP_

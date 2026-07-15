@@ -5,9 +5,9 @@
 
 using namespace food_vm;
 
-FoodVmPayment::FoodVmPayment(asio::any_io_executor executor, NotificationCallback<PaymentEvent> controller_callback)
-    : m_payment_state(PaymentState::CHOOSING_PAYMENT_METHOD),
-      m_executor(executor),
+FoodVmPayment::FoodVmPayment(asio::any_io_executor executor,
+                             NotificationCallback<PaymentEvent> controller_callback)
+    : m_payment_state(PaymentState::CHOOSING_PAYMENT_METHOD), m_executor(executor),
       m_controller_notification(controller_callback)
 {
 }
@@ -24,11 +24,7 @@ void FoodVmPayment::reset_payment_state()
 
 std::vector<std::string> FoodVmPayment::list_payment_options()
 {
-    return std::vector<std::string> {
-        "Debit",
-        "Credit"
-    };
-
+    return std::vector<std::string>{"Debit", "Credit"};
 }
 
 std::string FoodVmPayment::request_payment(const long double& amount)
@@ -46,7 +42,8 @@ void FoodVmPayment::process_payment(const long double& amount, const long double
     std::shared_ptr<FoodVmPayment> self = shared_from_this();
     self->m_payment_state = PaymentState::PROCESSING_PAYMENT;
 
-    std::shared_ptr<asio::steady_timer> timer = std::make_shared<asio::steady_timer>(self->m_executor, std::chrono::seconds(1));
+    std::shared_ptr<asio::steady_timer> timer =
+        std::make_shared<asio::steady_timer>(self->m_executor, std::chrono::seconds(1));
 
     timer->async_wait([self, timer, amount, money_input](const asio::error_code& ec) {
         PaymentEvent event;
@@ -63,11 +60,10 @@ void FoodVmPayment::process_payment(const long double& amount, const long double
             return;
         }
 
-        std::shared_ptr<asio::steady_timer> t =
-            std::make_shared<asio::steady_timer>(
-                self->m_executor, std::chrono::seconds(rand() % 5 + 1));
+        std::shared_ptr<asio::steady_timer> t = std::make_shared<asio::steady_timer>(
+            self->m_executor, std::chrono::seconds(rand() % 5 + 1));
 
-        t->async_wait([self, t] (const asio::error_code& ec) {
+        t->async_wait([self, t](const asio::error_code& ec) {
             PaymentEvent event;
             if (ec.value()) {
                 std::cerr << "Error processing payment: " << ec.message() << std::endl;

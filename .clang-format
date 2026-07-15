@@ -1,0 +1,29 @@
+BasedOnStyle: LLVM
+
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+ColumnLimit: 100
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterClass: false
+  AfterStruct: false
+  AfterEnum: false
+  AfterControlStatement: false
+  AfterNamespace: false
+  AfterUnion: false
+  BeforeCatch: true
+  BeforeElse: true
+  SplitEmptyFunction: true
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: Empty
+
+PointerAlignment: Left
+
+SortIncludes: false

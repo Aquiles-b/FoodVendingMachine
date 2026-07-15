@@ -9,8 +9,7 @@ std::vector<std::string_view> tokenize_input(std::string_view input)
     std::string_view separators = " \r\n\t";
     std::string_view::size_type begin, end;
 
-    while (!input.empty())
-    {
+    while (!input.empty()) {
         begin = input.find_first_not_of(separators);
         if (begin == std::string_view::npos) {
             break;
@@ -37,14 +36,12 @@ std::string to_uppercase(const std::string& s)
     std::string result(s);
 
     std::transform(s.begin(), s.end(), result.begin(),
-        [](unsigned char c) {
-            return std::toupper(c);
-        });
+                   [](unsigned char c) { return std::toupper(c); });
 
     return result;
 }
 
-bool is_digit(std::string_view s) 
+bool is_digit(std::string_view s)
 {
     return !s.empty() && s.find_first_not_of("1234567890") == std::string_view::npos;
 }

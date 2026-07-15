@@ -14,13 +14,13 @@ using namespace food_vm;
 void start_server(asio::io_context& io, asio::ip::tcp::acceptor& acp)
 {
     acp.async_accept([&io, &acp](const asio::error_code& e, asio::ip::tcp::socket socket) {
-            if (e.value()) {
-                std::cout << "Error on accept: (" << e.value() << ") " << e.message() << "\n";
-                return;
-            }
-            std::shared_ptr<ClientSession> cs = std::make_shared<ClientSession>(std::move(socket));
-            cs->start();
-            start_server(io, acp);
+        if (e.value()) {
+            std::cout << "Error on accept: (" << e.value() << ") " << e.message() << "\n";
+            return;
+        }
+        std::shared_ptr<ClientSession> cs = std::make_shared<ClientSession>(std::move(socket));
+        cs->start();
+        start_server(io, acp);
     });
 }
 

@@ -10,24 +10,24 @@
 namespace food_vm {
 
 class ClientSession : public std::enable_shared_from_this<ClientSession> {
-    public:
-        ClientSession(asio::ip::tcp::socket socket);
-        ~ClientSession();
+  public:
+    ClientSession(asio::ip::tcp::socket socket);
+    ~ClientSession();
 
-        void start();
-        void stop();
-        void read(std::shared_ptr<ClientSession> self);
-        void write(std::shared_ptr<ClientSession> self);
+    void start();
+    void stop();
+    void read(std::shared_ptr<ClientSession> self);
+    void write(std::shared_ptr<ClientSession> self);
 
-    private:
-        asio::ip::tcp::socket m_socket;
-        FoodVmDatabase m_food_vm_db;
-        FoodVmController m_controller;
-        std::string m_message;
+  private:
+    asio::ip::tcp::socket m_socket;
+    FoodVmDatabase m_food_vm_db;
+    FoodVmController m_controller;
+    std::string m_message;
 
-        void controller_notification_callback(ControllerEvent e);
+    void controller_notification_callback(ControllerEvent e);
 };
 
-} // food_vm
+} // namespace food_vm
 
-#endif  // _CLIENT_SESSION_HPP_
+#endif // _CLIENT_SESSION_HPP_
