@@ -1,11 +1,11 @@
-#ifndef _FOOD_VM_PAYMENT_HPP_
-#define _FOOD_VM_PAYMENT_HPP_
+#ifndef FVM_PAYMENT_HPP
+#define FVM_PAYMENT_HPP
 
 #include <vector>
 #include <string>
 #include <asio.hpp>
 
-#include <food_vm_notification.hpp>
+#include <fvm_notification.hpp>
 
 namespace food_vm {
 
@@ -26,9 +26,9 @@ struct PaymentEvent {
     PaymentStatus status;
 };
 
-class FoodVmPayment : public std::enable_shared_from_this<FoodVmPayment> {
+class FvmPayment : public std::enable_shared_from_this<FvmPayment> {
   public:
-    FoodVmPayment(asio::any_io_executor executor, NotificationCallback<PaymentEvent> callback);
+    FvmPayment(asio::any_io_executor executor, NotificationCallback<PaymentEvent> callback);
 
     std::vector<std::string> list_payment_options();
     std::string request_payment(const long double& amount);
@@ -41,9 +41,9 @@ class FoodVmPayment : public std::enable_shared_from_this<FoodVmPayment> {
   private:
     PaymentState m_payment_state;
     asio::any_io_executor m_executor;
-    FoodVmNotification<PaymentEvent> m_controller_notification;
+    FvmNotification<PaymentEvent> m_controller_notification;
 };
 
 } // namespace food_vm
 
-#endif // _FOOD_VM_PAYMENT_HPP_
+#endif // FVM_PAYMENT_HPP

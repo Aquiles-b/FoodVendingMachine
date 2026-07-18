@@ -1,5 +1,5 @@
-#ifndef _FOOD_VM_DATABASE_
-#define _FOOD_VM_DATABASE_
+#ifndef FVM_DATABASE_HPP
+#define FVM_DATABASE_HPP
 
 #include <set>
 #include <mysql_driver.h>
@@ -25,11 +25,11 @@ struct OrderInfo {
     long double total_price;
 };
 
-class FoodVmDatabase {
+class FvmDatabase {
   public:
-    FoodVmDatabase(const std::string& host, const std::string& user, const std::string& pass,
+    FvmDatabase(const std::string& host, const std::string& user, const std::string& pass,
                    const std::string& database);
-    ~FoodVmDatabase();
+    ~FvmDatabase();
 
     std::vector<ProductInfo> get_product_info();
     std::unordered_map<std::string, ProductInfo> get_product_info_name_mapped();
@@ -46,4 +46,4 @@ class FoodVmDatabase {
 
 } // namespace food_vm
 
-#endif // _FOOD_VM_DATABASE_
+#endif // FVM_DATABASE_HPP

@@ -7,7 +7,7 @@
 #include <cppconn/statement.h>
 #include <cppconn/resultset.h>
 
-#include <client_session.hpp>
+#include <fvm_client_session.hpp>
 
 using namespace food_vm;
 
@@ -18,7 +18,7 @@ void start_server(asio::io_context& io, asio::ip::tcp::acceptor& acp)
             std::cout << "Error on accept: (" << e.value() << ") " << e.message() << "\n";
             return;
         }
-        std::shared_ptr<ClientSession> cs = std::make_shared<ClientSession>(std::move(socket));
+        std::shared_ptr<FvmClientSession> cs = std::make_shared<FvmClientSession>(std::move(socket));
         cs->start();
         start_server(io, acp);
     });

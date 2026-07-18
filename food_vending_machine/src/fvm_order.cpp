@@ -1,25 +1,25 @@
-#include <food_vm_order.hpp>
+#include <fvm_order.hpp>
 #include <iomanip>
 #include <sstream>
 
 using namespace food_vm;
 
-FoodVmOrder::FoodVmOrder(FoodVmDatabase& food_vm_db)
-    : m_food_vm_db{food_vm_db}, m_processing_order{false}
+FvmOrder::FvmOrder(FvmDatabase& food_vm_db)
+    : m_fvm_db{food_vm_db}, m_processing_order{false}
 {
 }
 
-const OrderInfo& FoodVmOrder::get_order_info() const
+const OrderInfo& FvmOrder::get_order_info() const
 {
     return m_order;
 }
 
-void FoodVmOrder::clear_order()
+void FvmOrder::clear_order()
 {
     m_processing_order = false;
 }
 
-void FoodVmOrder::add_product(std::vector<size_t> product_ids)
+void FvmOrder::add_product(std::vector<size_t> product_ids)
 {
     if (!m_processing_order) {
         create_order();
@@ -30,7 +30,7 @@ void FoodVmOrder::add_product(std::vector<size_t> product_ids)
     }
 
     std::unordered_map<size_t, ProductInfo> prod_id_mapped =
-        m_food_vm_db.get_product_info_id_mapped();
+        m_fvm_db.get_product_info_id_mapped();
 
     m_order.total_price = 0.0;
     for (const size_t& id : m_order.product_ids) {
@@ -42,14 +42,14 @@ void FoodVmOrder::add_product(std::vector<size_t> product_ids)
     update_selected_products_table_message(prod_id_mapped);
 }
 
-void FoodVmOrder::create_order()
+void FvmOrder::create_order()
 {
     m_processing_order = true;
-    m_order = m_food_vm_db.create_order(order_event_to_string(FoodVmOrderStatus::CREATED));
-    register_event(FoodVmOrderStatus::CREATED);
+    m_order = m_fvm_db.create_order(order_event_to_string(FvmOrderStatus::CREATED));
+    register_event(FvmOrderStatus::CREATED);
 }
 
-void FoodVmOrder::update_selected_products_table_message(
+void FvmOrder::update_selected_products_table_message(
     std::unordered_map<size_t, ProductInfo>& prod_id_mapped)
 {
     std::ostringstream out;
@@ -75,18 +75,18 @@ void FoodVmOrder::update_selected_products_table_message(
     m_selected_products_table_message = out.str();
 }
 
-const std::string& FoodVmOrder::get_selected_products_table_message() const
+const std::string& FvmOrder::get_selected_products_table_message() const
 {
     return m_selected_products_table_message;
 }
 
-void FoodVmOrder::register_event(FoodVmOrderStatus event)
+void FvmOrder::register_event(FvmOrderStatus event)
 {
     std::string event_str = order_event_to_string(event);
-    m_food_vm_db.register_order_event(event_str, m_order);
+    m_fvm_db.register_order_event(event_str, m_order);
 }
 
-bool FoodVmOrder::separate_order(std::string& error_msg)
+bool FvmOrder::separate_order(std::string& error_msg)
 {
     if (!m_processing_order) {
         error_msg = "No order in progress.";
@@ -98,16 +98,16 @@ bool FoodVmOrder::separate_order(std::string& error_msg)
         return false;
     }
 
-    if (!m_food_vm_db.separate_order(m_order, error_msg)) {
+    if (!m_fvm_db.separate_order(m_order, error_msg)) {
         return false;
     }
 
-    register_event(FoodVmOrderStatus::CONFIRMED);
+    register_event(FvmOrderStatus::CONFIRMED);
 
     return true;
 }
 
-void FoodVmOrder::register_order_products()
+void FvmOrder::register_order_products()
 {
     if (!m_processing_order) {
         return;
@@ -117,5 +117,5 @@ void FoodVmOrder::register_order_products()
         return;
     }
 
-    m_food_vm_db.register_order_products(m_order);
+    m_fvm_db.register_order_products(m_order);
 }

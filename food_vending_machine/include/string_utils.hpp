@@ -1,5 +1,5 @@
-#ifndef _STRING_UTILS_HPP_
-#define _STRING_UTILS_HPP_
+#ifndef FVM_STRING_UTILS_HPP
+#define FVM_STRING_UTILS_HPP
 
 #include <string>
 #include <vector>
@@ -12,4 +12,4 @@ bool is_digit(std::string_view s);
 
 } // namespace food_vm::str_util
 
-#endif // _STRING_UTILS_HPP_
+#endif // FVM_STRING_UTILS_HPP

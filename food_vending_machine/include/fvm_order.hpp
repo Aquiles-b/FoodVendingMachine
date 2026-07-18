@@ -1,13 +1,13 @@
-#ifndef _FOOD_VM_ORDER_HPP_
-#define _FOOD_VM_ORDER_HPP_
+#ifndef FVM_ORDER_HPP
+#define FVM_ORDER_HPP
 
 #include <vector>
 
-#include <food_vm_database.hpp>
+#include <fvm_database.hpp>
 
 namespace food_vm {
 
-enum class FoodVmOrderStatus {
+enum class FvmOrderStatus {
     CREATED,
     CONFIRMED,
     PAYMENT_CONFIRMED,
@@ -18,14 +18,14 @@ enum class FoodVmOrderStatus {
     CANCELLED
 };
 
-class FoodVmOrder {
+class FvmOrder {
   public:
-    FoodVmOrder(FoodVmDatabase& food_vm_db);
+    FvmOrder(FvmDatabase& fvm_db);
 
     const OrderInfo& get_order_info() const;
     void clear_order();
     void add_product(std::vector<size_t> product_ids);
-    void register_event(FoodVmOrderStatus event);
+    void register_event(FvmOrderStatus event);
     bool separate_order(std::string& error_msg);
     void register_order_products();
 
@@ -33,7 +33,7 @@ class FoodVmOrder {
 
   private:
     OrderInfo m_order;
-    FoodVmDatabase& m_food_vm_db;
+    FvmDatabase& m_fvm_db;
     std::string m_selected_products_table_message;
     bool m_processing_order;
 
@@ -41,24 +41,24 @@ class FoodVmOrder {
     update_selected_products_table_message(std::unordered_map<size_t, ProductInfo>& prod_id_mapped);
     void create_order();
 
-    static std::string order_event_to_string(FoodVmOrderStatus event)
+    static std::string order_event_to_string(FvmOrderStatus event)
     {
         switch (event) {
-        case FoodVmOrderStatus::CREATED:
+        case FvmOrderStatus::CREATED:
             return "CREATED";
-        case FoodVmOrderStatus::CONFIRMED:
+        case FvmOrderStatus::CONFIRMED:
             return "CONFIRMED";
-        case FoodVmOrderStatus::PAYMENT_CONFIRMED:
+        case FvmOrderStatus::PAYMENT_CONFIRMED:
             return "PAYMENT_CONFIRMED";
-        case FoodVmOrderStatus::PAYMENT_FAILED:
+        case FvmOrderStatus::PAYMENT_FAILED:
             return "PAYMENT_FAILED";
-        case FoodVmOrderStatus::PREPARATION_STARTED:
+        case FvmOrderStatus::PREPARATION_STARTED:
             return "PREPARATION_STARTED";
-        case FoodVmOrderStatus::READY:
+        case FvmOrderStatus::READY:
             return "READY";
-        case FoodVmOrderStatus::PICKED_UP:
+        case FvmOrderStatus::PICKED_UP:
             return "PICKED_UP";
-        case FoodVmOrderStatus::CANCELLED:
+        case FvmOrderStatus::CANCELLED:
             return "CANCELLED";
         }
         return "UNKNOWN";
@@ -67,4 +67,4 @@ class FoodVmOrder {
 
 } // namespace food_vm
 
-#endif // _FOOD_VM_ORDER_HPP_
+#endif // FVM_ORDER_HPP

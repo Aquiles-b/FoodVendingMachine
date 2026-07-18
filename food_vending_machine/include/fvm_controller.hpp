@@ -1,13 +1,13 @@
-#ifndef _FOOD_VM_CONTROLLER_
-#define _FOOD_VM_CONTROLLER_
+#ifndef FVM_CONTROLLER_HPP
+#define FVM_CONTROLLER_HPP
 
 #include <asio/any_io_executor.hpp>
 #include <vector>
 
-#include <food_vm_database.hpp>
-#include <food_vm_payment.hpp>
-#include <food_vm_notification.hpp>
-#include <food_vm_order.hpp>
+#include <fvm_database.hpp>
+#include <fvm_payment.hpp>
+#include <fvm_notification.hpp>
+#include <fvm_order.hpp>
 
 namespace food_vm {
 
@@ -15,22 +15,22 @@ struct ControllerEvent {
     std::string message;
 };
 
-enum class FoodVmControllerState { MENU, PAYMENT };
+enum class FvmControllerState { MENU, PAYMENT };
 
-class FoodVmController {
+class FvmController {
   public:
-    FoodVmController(FoodVmDatabase& food_vm_database, asio::any_io_executor executor,
+    FvmController(FvmDatabase& food_vm_database, asio::any_io_executor executor,
                      NotificationCallback<ControllerEvent> client_notification);
 
     std::string parse_user_input(std::string user_input);
 
   private:
-    FoodVmDatabase& m_food_vm_db;
+    FvmDatabase& m_fvm_db;
     asio::any_io_executor m_executor;
-    FoodVmNotification<ControllerEvent> m_client_notification;
-    FoodVmControllerState m_controller_state;
-    std::shared_ptr<FoodVmPayment> m_food_vm_payment;
-    FoodVmOrder m_order;
+    FvmNotification<ControllerEvent> m_client_notification;
+    FvmControllerState m_controller_state;
+    std::shared_ptr<FvmPayment> m_fvm_payment;
+    FvmOrder m_order;
 
     std::string select_products(const std::vector<std::string_view>& selected_prods);
     std::string confirm_order();
@@ -45,4 +45,4 @@ class FoodVmController {
 
 } // namespace food_vm
 
-#endif // _FOOD_VM_CONTROLLER_
+#endif // FVM_CONTROLLER_HPP

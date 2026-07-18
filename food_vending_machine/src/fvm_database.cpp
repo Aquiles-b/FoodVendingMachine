@@ -1,10 +1,10 @@
-#include <food_vm_database.hpp>
+#include <fvm_database.hpp>
 #include <sstream>
 #include <string_utils.hpp>
 
 using namespace food_vm;
 
-FoodVmDatabase::FoodVmDatabase(const std::string& host, const std::string& user,
+FvmDatabase::FvmDatabase(const std::string& host, const std::string& user,
                                const std::string& pass, const std::string& database)
 {
     sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
@@ -13,9 +13,9 @@ FoodVmDatabase::FoodVmDatabase(const std::string& host, const std::string& user,
     m_connection->setSchema(database);
 }
 
-FoodVmDatabase::~FoodVmDatabase() {}
+FvmDatabase::~FvmDatabase() {}
 
-std::vector<ProductInfo> FoodVmDatabase::get_product_info()
+std::vector<ProductInfo> FvmDatabase::get_product_info()
 {
     std::unique_ptr<sql::Statement> statement(m_connection->createStatement());
     std::unique_ptr<sql::ResultSet> result(statement->executeQuery("SELECT * FROM products"));
@@ -33,7 +33,7 @@ std::vector<ProductInfo> FoodVmDatabase::get_product_info()
     return products;
 }
 
-std::unordered_map<std::string, ProductInfo> FoodVmDatabase::get_product_info_name_mapped()
+std::unordered_map<std::string, ProductInfo> FvmDatabase::get_product_info_name_mapped()
 {
     std::vector<ProductInfo> prods = get_product_info();
     std::unordered_map<std::string, ProductInfo> prod_info_name_mapped;
@@ -46,7 +46,7 @@ std::unordered_map<std::string, ProductInfo> FoodVmDatabase::get_product_info_na
     return prod_info_name_mapped;
 }
 
-std::unordered_map<size_t, ProductInfo> FoodVmDatabase::get_product_info_id_mapped()
+std::unordered_map<size_t, ProductInfo> FvmDatabase::get_product_info_id_mapped()
 {
     std::vector<ProductInfo> prods = get_product_info();
     std::unordered_map<size_t, ProductInfo> prod_info_id_mapped;
@@ -58,7 +58,7 @@ std::unordered_map<size_t, ProductInfo> FoodVmDatabase::get_product_info_id_mapp
     return prod_info_id_mapped;
 }
 
-OrderInfo FoodVmDatabase::create_order(std::string initial_state)
+OrderInfo FvmDatabase::create_order(std::string initial_state)
 {
     std::unique_ptr<sql::Statement> statement(m_connection->createStatement());
 
@@ -77,7 +77,7 @@ OrderInfo FoodVmDatabase::create_order(std::string initial_state)
     throw std::runtime_error("Error creating order: could not retrieve last insert ID.");
 }
 
-void FoodVmDatabase::register_order_event(std::string_view event, OrderInfo& order_info)
+void FvmDatabase::register_order_event(std::string_view event, OrderInfo& order_info)
 {
     std::unique_ptr<sql::Statement> statement(m_connection->createStatement());
 
@@ -96,7 +96,7 @@ void FoodVmDatabase::register_order_event(std::string_view event, OrderInfo& ord
     order_info.state = event_str;
 }
 
-bool FoodVmDatabase::separate_order(OrderInfo& order_info, std::string& error_msg)
+bool FvmDatabase::separate_order(OrderInfo& order_info, std::string& error_msg)
 {
     if (order_info.product_ids.empty()) {
         error_msg = "Order has no products to separate.";
@@ -163,7 +163,7 @@ bool FoodVmDatabase::separate_order(OrderInfo& order_info, std::string& error_ms
     return !order_info.product_ids.empty();
 }
 
-void FoodVmDatabase::register_order_products(OrderInfo& order_info)
+void FvmDatabase::register_order_products(OrderInfo& order_info)
 {
     if (order_info.product_ids.empty()) {
         return;

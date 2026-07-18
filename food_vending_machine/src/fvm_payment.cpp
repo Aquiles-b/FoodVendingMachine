@@ -1,33 +1,33 @@
-#include <food_vm_payment.hpp>
+#include <fvm_payment.hpp>
 #include <iomanip>
 #include <sstream>
 #include <iostream>
 
 using namespace food_vm;
 
-FoodVmPayment::FoodVmPayment(asio::any_io_executor executor,
+FvmPayment::FvmPayment(asio::any_io_executor executor,
                              NotificationCallback<PaymentEvent> controller_callback)
     : m_payment_state(PaymentState::CHOOSING_PAYMENT_METHOD), m_executor(executor),
       m_controller_notification(controller_callback)
 {
 }
 
-PaymentState FoodVmPayment::get_payment_state() const
+PaymentState FvmPayment::get_payment_state() const
 {
     return m_payment_state;
 }
 
-void FoodVmPayment::reset_payment_state()
+void FvmPayment::reset_payment_state()
 {
     m_payment_state = PaymentState::CHOOSING_PAYMENT_METHOD;
 }
 
-std::vector<std::string> FoodVmPayment::list_payment_options()
+std::vector<std::string> FvmPayment::list_payment_options()
 {
     return std::vector<std::string>{"Debit", "Credit"};
 }
 
-std::string FoodVmPayment::request_payment(const long double& amount)
+std::string FvmPayment::request_payment(const long double& amount)
 {
     m_payment_state = PaymentState::WAITING_FOR_PAYMENT;
 
@@ -37,9 +37,9 @@ std::string FoodVmPayment::request_payment(const long double& amount)
     return out.str();
 }
 
-void FoodVmPayment::process_payment(const long double& amount, const long double& money_input)
+void FvmPayment::process_payment(const long double& amount, const long double& money_input)
 {
-    std::shared_ptr<FoodVmPayment> self = shared_from_this();
+    std::shared_ptr<FvmPayment> self = shared_from_this();
     self->m_payment_state = PaymentState::PROCESSING_PAYMENT;
 
     std::shared_ptr<asio::steady_timer> timer =
